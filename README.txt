@@ -2,14 +2,14 @@ $Id: README.txt,v 1.1 2010/03/04 05:38:42 ceardach Exp $
 
 ENVIRONMENT
 
-Creates a drush command line interface for setting an environment for a site
-instance.  Other modules may then change their logic depending upon the current
-active environment.  The 'drush env-switch' command also invokes a hook to allow
-each module to run additional required actions when switching environments.
+Creates an api for specifying an environment for a site instance.  Other modules
+may then change their logic depending upon the current active environment. When
+switching environments a hook is invoked to allow each module to run additional
+required actions.
 
 The environment states are completely customizable and may be arbitrarily set
-to any value that makes sense for the project at hand.  The recommended set of
-environment states are 'development', 'production', and 'readonly'.
+to any value that makes sense for the project at hand. Predefined environments
+are 'development' and 'production'.
 
 
 Example
@@ -20,6 +20,7 @@ Example
  drush env-switch --force production       Force the environment to switch to
                                            production even if the current
                                            environment already is production
+ drush env                                 Shows current environment
 
 
 Hooks Invoked
@@ -34,3 +35,5 @@ Additional Behaviors
 Drush:
   - drush env-switch
     Invokes switching the environment
+  - drush env
+    Shows current environment
