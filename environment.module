@@ -10,11 +10,12 @@
  * Implementation of hook_init().
  */
 function environment_init() {
-  $current_env  = variable_get('environment', NULL);
   $env_override = variable_get('environment_override', NULL);
-
-  if ($current_env != $env_override) {
-    environment_switch($env_override);
+  if ($env_override) {
+    $current_env  = variable_get('environment', NULL);
+    if ($current_env != $env_override) {
+      environment_switch($env_override);
+    }
   }
 }
 

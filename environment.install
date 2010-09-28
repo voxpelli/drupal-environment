@@ -1,0 +1,22 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Handles installation of the Environment module.
+ */
+
+/**
+ * Implementation of hook_install().
+ */
+function environment_install() {
+  // New module weights in core: put environment as the very last in the chain.
+  db_query("UPDATE {system} SET weight = -100 WHERE name = 'environment'");
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function environment_uninstall() {
+  variable_del('environment');
+}

@@ -67,32 +67,37 @@ function drush_environment_switch() {
   if ($args = func_get_args()) {
     $force = drush_get_option('force');
 
-    $target_env  = $args[0];
-    $current_env = variable_get('environment', NULL);
+    $target_env   = $args[0];
+    $current_env  = variable_get('environment', NULL);
+    $env_override = variable_get('environment_override', NULL);
 
-    if ($current_env == $target_env && !$force) {
+    if (!$force && $current_env == $target_env) {
       drush_print("WARNING: The current environment is already set to '{$current_env}'.");
-      drush_print("To force the environment switch to run, use the '--force' flag.");
-      return;
+      drush_print("To force the environment switch to run anyway, use the '--force' flag.");
     }
-
-    drush_print("Switching the environment to {$target_env}...");
-
-    $result   = environment_switch($target_env, $force);
-    $messages = $result['messages'];
-
-    foreach ($messages as $message) {
-      drush_print('- ' . $message);
-    }
-
-    if ($result['result']) {
-      drush_print("Done.");
+    else if (!$force && $env_override && $target_env != $env_override) {
+      drush_print("WARNING: The current environment is overriden with '{$env_override}'.");
+      drush_print("To force the environment switch to run anyway, use the '--force' flag.");
     }
     else {
-      drush_print("Failed.");
+      drush_print("Switching the environment to {$target_env}...");
+
+      $result   = environment_switch($target_env, $force);
+      $messages = $result['messages'];
+
+      foreach ($messages as $message) {
+        drush_print('- ' . $message);
+      }
+
+      if ($result['result']) {
+        drush_print("Done.");
+      }
+      else {
+        drush_print("Failed.");
+      }
     }
   }
   else {
-    drush_print("ERROR: You must provide the environment to switch to.");
+    return drush_set_error('DRUSH_ENVIRONMENT_ERROR', dt('You must provide the environment to switch to.'));
   }
 }
