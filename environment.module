@@ -1,0 +1,6 @@
+<?php
+// $Id: environment.module,v 1.1 2010/03/04 05:38:42 ceardach Exp $
+
+/**
+ * @file Placeholder file.  All functionality exists in the drush command.
+ */
