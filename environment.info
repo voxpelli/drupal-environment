@@ -1,6 +1,4 @@
 ; $Id: environment.info,v 1.1 2010/03/04 05:38:42 ceardach Exp $
 name = Environment
 description = Sets the environment variable for a site instance
-
-version = "6.x-1.0"
-core = "6.x"
+core = 6.x 

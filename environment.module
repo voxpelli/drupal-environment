@@ -2,5 +2,137 @@
 // $Id: environment.module,v 1.1 2010/03/04 05:38:42 ceardach Exp $
 
 /**
- * @file Placeholder file.  All functionality exists in the drush command.
+ * @file
+ * Module for handling changes in server environments
  */
+
+/**
+ * Implementation of hook_init().
+ */
+function environment_init() {
+  $current_env  = variable_get('environment', NULL);
+  $env_override = variable_get('environment-override', NULL);
+
+  if ($current_env != $env_override) {
+    environment_switch($env_override);
+  }
+}
+
+/**
+ * Implementation of hook_environments().
+ */
+function environment_environments() {
+  return array(
+    'production' => array(
+      'default' => TRUE,
+    ),
+    'development' => array(
+      'default' => FALSE,
+    ),
+  );
+}
+
+/**
+ * Check if something is allowed in the current environment.
+ *
+ * @param $name
+ *   Name of the thing to check if allowed, eg. function.
+ * @param $category
+ *   (optional) Category of the thing to check for, eg. name of module. Defaults to 'other'.
+ * @param $default
+ *   (optional) What the default should be if no environment value is found. Defaults to FALSE.
+ *
+ * @return
+ *   TRUE or FALSE for whether the thing is allowed.
+ */
+function environment_allowed($name, $category = 'other', $default = FALSE) {
+  $env = variable_get('environment', NULL);
+
+  if ($env) {
+    $env = environment_get($env);
+  }
+
+  if (!empty($env)) {
+    if (!empty($env[$category])) {
+      if (isset($env[$category][$name])) {
+        $result = $env[$category][$name];
+      }
+      elseif (isset($env[$category]['default'])) {
+        $result = $env[$category]['default'];
+      }
+    }
+    if (!isset($result) && isset($env['default'])) {
+      $result = $env['default'];
+    }
+  }
+
+  if (!isset($result)) {
+    $result = $default;
+  }
+
+  return $result;
+}
+
+/**
+ * Fetches all available environments.
+ *
+ * @param $env
+ *   (optional) Name of the environment.
+ *
+ * @return
+ *   Return all environments or the specified environment.
+ */
+function environment_get($env = NULL) {
+  static $environments;
+
+  if (!isset($environments)) {
+    $environments = module_invoke_all('environments');
+  }
+
+  if ($env) {
+    return isset($environments[$env]) ? $environments[$env] : FALSE;
+  }
+  else {
+    return $environments;
+  }
+}
+
+/**
+ * Switches between two environments.
+ *
+ * @param $target_env
+ *   Name of the environment to change to.
+ * @param $force
+ *   (optional) Whether to trigger a change even if the environment is the currently set one. Defaults to FALSE.
+ *
+ * @return
+ *   Return messages telling what has happened.
+ */
+function environment_switch($target_env, $force = FALSE) {
+  $result = FALSE;
+  $messages = array();
+
+  $current_env = variable_get('environment', NULL);
+
+  if ($current_env != $target_env || !$force) {
+    if (!environment_get($target_env)) {
+      $messages[] = "Environment {$target_env} doesn't exists.";
+    }
+    else {
+      variable_set('environment', $target_env);
+
+      $messages += module_invoke_all('environment_switch', $target_env, $current_env);
+
+      drupal_flush_all_caches();
+
+      $messages[] = 'Cleared cache';
+
+      $result = TRUE;
+    }
+  }
+
+  return array(
+    'result'   => $result,
+    'messages' => $messages,
+  );
+}
