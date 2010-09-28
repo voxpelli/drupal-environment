@@ -6,6 +6,8 @@
  * Module for handling changes in server environments
  */
 
+//TODO: Add a setting to the db to the ignore environment-variable and always set it the environment_override so that we can avoid people forgetting to set a clone of their live sites as development sites. With such a setting turned on and a environment_override in the production server's settings.php file a development clone would automatically fail if no correct environment_override has been added in it's settings.php file.
+
 /**
  * Implementation of hook_init().
  */
