@@ -86,7 +86,8 @@ function environment_get($env = NULL) {
   static $environments;
 
   if (!isset($environments)) {
-    $environments = module_invoke_all('environments');
+    $environments  = module_invoke_all('environments');
+    $environments += variable_get('environment_definitions', array());
   }
 
   if ($env) {
